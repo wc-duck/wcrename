@@ -20,41 +20,41 @@
 
 #include <stdio.h>
 
-enum renamy_modify_mode
+enum wcrename_modify_mode
 {
-	RENAMY_MODIFY_MODE_REPLACE,
-	RENAMY_MODIFY_MODE_REPLACE_BEGIN,
-	RENAMY_MODIFY_MODE_REPLACE_END,
-	RENAMY_MODIFY_MODE_APPEND,
-	RENAMY_MODIFY_MODE_PREPEND,
-	RENAMY_MODIFY_MODE_CHANGE_EXT,
-	RENAMY_MODIFY_MODE_CHANGE_CASE,
+	WCRENAME_MODIFY_MODE_REPLACE,
+	WCRENAME_MODIFY_MODE_REPLACE_BEGIN,
+	WCRENAME_MODIFY_MODE_REPLACE_END,
+	WCRENAME_MODIFY_MODE_APPEND,
+	WCRENAME_MODIFY_MODE_PREPEND,
+	WCRENAME_MODIFY_MODE_CHANGE_EXT,
+	WCRENAME_MODIFY_MODE_CHANGE_CASE,
 
-	RENAMY_MODIFY_MODE_COUNT
+	WCRENAME_MODIFY_MODE_COUNT
 };
 
-enum renamy_casing
+enum wcrename_casing
 {
-	RENAMY_CASING_LOWER_WITH_UNDERSCORE,
-	RENAMY_CASING_LOWER_WITH_SPACE,
-	RENAMY_CASING_UPPER_WITH_UNDERSCORE,
-	RENAMY_CASING_UPPER_WITH_SPACE,
-	RENAMY_CASING_CAMEL,
+	WCRENAME_CASING_LOWER_WITH_UNDERSCORE,
+	WCRENAME_CASING_LOWER_WITH_SPACE,
+	WCRENAME_CASING_UPPER_WITH_UNDERSCORE,
+	WCRENAME_CASING_UPPER_WITH_SPACE,
+	WCRENAME_CASING_CAMEL,
 
-	RENAMY_CASING_COUNT
+	WCRENAME_CASING_COUNT
 };
 
-enum renamy_copy_type
+enum wcrename_copy_type
 {
-	RENAMY_COPY_TYPE_SIMULATE,
-	RENAMY_COPY_TYPE_FS_MOVE,
-	RENAMY_COPY_TYPE_FS_COPY,
-	RENAMY_COPY_TYPE_P4,
+	WCRENAME_COPY_TYPE_SIMULATE,
+	WCRENAME_COPY_TYPE_FS_MOVE,
+	WCRENAME_COPY_TYPE_FS_COPY,
+	WCRENAME_COPY_TYPE_P4,
 
-	RENAMY_COPY_TYPE_COUNT
+	WCRENAME_COPY_TYPE_COUNT
 };
 
-const char* RENAMY_MODIFY_MODE_NAMES[RENAMY_MODIFY_MODE_COUNT] = {
+const char* WCRENAME_MODIFY_MODE_NAMES[WCRENAME_MODIFY_MODE_COUNT] = {
 		"replace",
 		"replace-begin",
 		"replace-end",
@@ -64,7 +64,7 @@ const char* RENAMY_MODIFY_MODE_NAMES[RENAMY_MODIFY_MODE_COUNT] = {
 		"change-case"
 };
 
-const char* RENAMY_CASING_NAMES[RENAMY_CASING_COUNT] = {
+const char* WCRENAME_CASING_NAMES[WCRENAME_CASING_COUNT] = {
 		"lower_case",
 		"lower case",
 		"UPPER_CASE",
@@ -72,7 +72,7 @@ const char* RENAMY_CASING_NAMES[RENAMY_CASING_COUNT] = {
 		"CamelCase"
 };
 
-const char* RENAMY_COPY_TYPES_NAMES[RENAMY_COPY_TYPE_COUNT] = {
+const char* WCRENAME_COPY_TYPES_NAMES[WCRENAME_COPY_TYPE_COUNT] = {
 		"simulate",
 		"move",
 		"copy",
@@ -80,7 +80,7 @@ const char* RENAMY_COPY_TYPES_NAMES[RENAMY_COPY_TYPE_COUNT] = {
 };
 
 
-static void renamy_copy_files( renamy_copy_type type, const QStringList& src, const QStringList& dst, int count )
+static void wcrename_copy_files( wcrename_copy_type type, const QStringList& src, const QStringList& dst, int count )
 {
 	for( int i = 0; i < count; ++i )
 	{
@@ -89,31 +89,31 @@ static void renamy_copy_files( renamy_copy_type type, const QStringList& src, co
 
 		switch( type )
 		{
-			case RENAMY_COPY_TYPE_SIMULATE:
+			case WCRENAME_COPY_TYPE_SIMULATE:
 				printf("copy %s -> %s\n", src[i].toUtf8().data(), dst[i].toUtf8().data() );
 				break;
-			case RENAMY_COPY_TYPE_FS_MOVE:
+			case WCRENAME_COPY_TYPE_FS_MOVE:
 				QFile( src[i] ).rename( dst[i] ); // TODO: handle error!
 				break;
-			case RENAMY_COPY_TYPE_FS_COPY:
+			case WCRENAME_COPY_TYPE_FS_COPY:
 				QFile( src[i] ).copy( dst[i] ); // TODO: handle error!
 				break;
-			case RENAMY_COPY_TYPE_P4:
+			case WCRENAME_COPY_TYPE_P4:
 				QProcess().start("p4", QStringList() << "move" << src[i] << dst[i]);
 				break;
 		}
 	}
 }
 
-struct renamy_filter_op
+struct wcrename_filter_op
 {
-	renamy_modify_mode _op;
-	renamy_casing _casing;
+	wcrename_modify_mode _op;
+	wcrename_casing _casing;
 	QString _arg1;
 	QString _arg2;
 };
 
-void renamy_filter_apply( const QList<renamy_filter_op>& ops, const QStringList& src, QStringList& dst )
+void wcrename_filter_apply( const QList<wcrename_filter_op>& ops, const QStringList& src, QStringList& dst )
 {
 	// ... reset ...
 	for( int i = 0; i < src.size(); ++i )
@@ -130,14 +130,14 @@ void renamy_filter_apply( const QList<renamy_filter_op>& ops, const QStringList&
 
 			switch( ops[op_index]._op )
 			{
-				case RENAMY_MODIFY_MODE_REPLACE:
+				case WCRENAME_MODIFY_MODE_REPLACE:
 				{
 					QString replace = ops[op_index]._arg1;
 					QString with    = ops[op_index]._arg2;
 					file = file.replace( replace, with );
 				}
 				break;
-				case RENAMY_MODIFY_MODE_REPLACE_BEGIN:
+				case WCRENAME_MODIFY_MODE_REPLACE_BEGIN:
 				{
 					QString replace = ops[op_index]._arg1;
 					QString with    = ops[op_index]._arg2;
@@ -145,7 +145,7 @@ void renamy_filter_apply( const QList<renamy_filter_op>& ops, const QStringList&
 						file = file.replace( 0, replace.size(), with );
 				}
 				break;
-				case RENAMY_MODIFY_MODE_REPLACE_END:
+				case WCRENAME_MODIFY_MODE_REPLACE_END:
 				{
 					QString replace = ops[op_index]._arg1;
 					QString with    = ops[op_index]._arg2;
@@ -153,24 +153,24 @@ void renamy_filter_apply( const QList<renamy_filter_op>& ops, const QStringList&
 						file = file.replace( file.size() - replace.size(), replace.size(), with );
 				}
 				break;
-				case RENAMY_MODIFY_MODE_APPEND:
+				case WCRENAME_MODIFY_MODE_APPEND:
 				{
 					file = file + ops[op_index]._arg1;
 				}
 				break;
-				case RENAMY_MODIFY_MODE_PREPEND:
+				case WCRENAME_MODIFY_MODE_PREPEND:
 				{
 					file = ops[op_index]._arg1 + file;
 				}
 				break;
-				case RENAMY_MODIFY_MODE_CHANGE_EXT:
+				case WCRENAME_MODIFY_MODE_CHANGE_EXT:
 				{
 					QString newext = ops[op_index]._arg1;
 					if( !newext.isEmpty() )
 						ext = newext;
 				}
 				break;
-				case RENAMY_MODIFY_MODE_CHANGE_CASE:
+				case WCRENAME_MODIFY_MODE_CHANGE_CASE:
 				{
 					// change case ...
 					file = file.replace('_', ' ');
@@ -179,27 +179,27 @@ void renamy_filter_apply( const QList<renamy_filter_op>& ops, const QStringList&
 
 					switch( ops[op_index]._casing )
 					{
-						case RENAMY_CASING_LOWER_WITH_UNDERSCORE:
+						case WCRENAME_CASING_LOWER_WITH_UNDERSCORE:
 							for( int i = 0; i < split.count(); ++i )
 								split[i] = split[i].toLower();
 							file = split.join('_');
 							break;
-						case RENAMY_CASING_LOWER_WITH_SPACE:
+						case WCRENAME_CASING_LOWER_WITH_SPACE:
 							for( int i = 0; i < split.count(); ++i )
 								split[i] = split[i].toLower();
 							file = split.join(' ');
 							break;
-						case RENAMY_CASING_UPPER_WITH_UNDERSCORE:
+						case WCRENAME_CASING_UPPER_WITH_UNDERSCORE:
 							for( int i = 0; i < split.count(); ++i )
 								split[i] = split[i].toUpper();
 							file = split.join('_');
 							break;
-						case RENAMY_CASING_UPPER_WITH_SPACE:
+						case WCRENAME_CASING_UPPER_WITH_SPACE:
 							for( int i = 0; i < split.count(); ++i )
 								split[i] = split[i].toUpper();
 							file = split.join(' ');
 							break;
-						case RENAMY_CASING_CAMEL:
+						case WCRENAME_CASING_CAMEL:
 							for( int i = 0; i < split.count(); ++i )
 								split[i] = split[i].left(1).toUpper() + split[i].mid(1);
 							file = split.join("");
@@ -217,7 +217,7 @@ void renamy_filter_apply( const QList<renamy_filter_op>& ops, const QStringList&
 }
 
 
-class RenamyReplaceWidget : public QWidget
+class WcRenameReplaceWidget : public QWidget
 {
 	Q_OBJECT
 
@@ -232,7 +232,7 @@ public:
 	QString replace() { return _replace->text(); }
 	QString with()    { return _with->text(); }
 
-	RenamyReplaceWidget( QWidget* parent )
+	WcRenameReplaceWidget( QWidget* parent )
 		: QWidget(parent)
 	{
 		setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
@@ -247,12 +247,12 @@ public:
 
 		_replace->setFocus();
 
-		QObject::connect( _replace, &QLineEdit::textChanged, this, &RenamyReplaceWidget::updated );
-		QObject::connect( _with, &QLineEdit::textChanged, this, &RenamyReplaceWidget::updated );
+		QObject::connect( _replace, &QLineEdit::textChanged, this, &WcRenameReplaceWidget::updated );
+		QObject::connect( _with, &QLineEdit::textChanged, this, &WcRenameReplaceWidget::updated );
 	}
 };
 
-class RenamyAddWidget : public QWidget
+class WcRenameAddWidget : public QWidget
 {
 	Q_OBJECT
 
@@ -265,7 +265,7 @@ public:
 
 	QString add() { return _add->text(); }
 
-	RenamyAddWidget( QWidget* parent )
+	WcRenameAddWidget( QWidget* parent )
 		: QWidget(parent)
 	{
 		setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
@@ -277,11 +277,11 @@ public:
 
 		_add->setFocus();
 
-		QObject::connect( _add, &QLineEdit::textChanged, this, &RenamyAddWidget::updated );
+		QObject::connect( _add, &QLineEdit::textChanged, this, &WcRenameAddWidget::updated );
 	}
 };
 
-class RenamyChangeCaseWidget : public QWidget
+class WcRenameChangeCaseWidget : public QWidget
 {
 	Q_OBJECT
 
@@ -291,12 +291,12 @@ Q_SIGNALS:
 public:
 	QComboBox* _casing;
 
-	renamy_casing casing()
+	wcrename_casing casing()
 	{
-		return (renamy_casing)_casing->currentIndex();
+		return (wcrename_casing)_casing->currentIndex();
 	}
 
-	RenamyChangeCaseWidget( QWidget* parent )
+	WcRenameChangeCaseWidget( QWidget* parent )
 		: QWidget(parent)
 	{
 		setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
@@ -304,17 +304,17 @@ public:
 		QHBoxLayout* layout = new QHBoxLayout(this);
 		layout->setContentsMargins(0,0,0,0);
 		_casing = new QComboBox(this);
-		for( int i = 0; i < RENAMY_CASING_COUNT; ++ i )
-			_casing->addItem( RENAMY_CASING_NAMES[i] );
+		for( int i = 0; i < WCRENAME_CASING_COUNT; ++ i )
+			_casing->addItem( WCRENAME_CASING_NAMES[i] );
 		layout->addWidget( _casing );
 
 		_casing->setFocus();
 
-		QObject::connect( _casing, (void (QComboBox::*)(int))&QComboBox::currentIndexChanged, this, &RenamyChangeCaseWidget::updated );
+		QObject::connect( _casing, (void (QComboBox::*)(int))&QComboBox::currentIndexChanged, this, &WcRenameChangeCaseWidget::updated );
 	}
 };
 
-class RenamyEditLineWidget : public QWidget
+class WcRenameEditLineWidget : public QWidget
 {
 	Q_OBJECT
 Q_SIGNALS:
@@ -351,32 +351,32 @@ private:
 		return QWidget::eventFilter(watched, event);
 	}
 
-	QWidget* createModeWidget( renamy_modify_mode mode )
+	QWidget* createModeWidget( wcrename_modify_mode mode )
 	{
 		switch( mode )
 		{
-			case RENAMY_MODIFY_MODE_REPLACE:
-			case RENAMY_MODIFY_MODE_REPLACE_BEGIN:
-			case RENAMY_MODIFY_MODE_REPLACE_END:
+			case WCRENAME_MODIFY_MODE_REPLACE:
+			case WCRENAME_MODIFY_MODE_REPLACE_BEGIN:
+			case WCRENAME_MODIFY_MODE_REPLACE_END:
 			{
-				RenamyReplaceWidget* replace_widget = new RenamyReplaceWidget(this);
-				QObject::connect( replace_widget, &RenamyReplaceWidget::updated, this, &RenamyEditLineWidget::updated );
+				WcRenameReplaceWidget* replace_widget = new WcRenameReplaceWidget(this);
+				QObject::connect( replace_widget, &WcRenameReplaceWidget::updated, this, &WcRenameEditLineWidget::updated );
 				replace_widget->installEventFilter(this);
 				return replace_widget;
 			}
-			case RENAMY_MODIFY_MODE_APPEND:
-			case RENAMY_MODIFY_MODE_PREPEND:
-			case RENAMY_MODIFY_MODE_CHANGE_EXT:
+			case WCRENAME_MODIFY_MODE_APPEND:
+			case WCRENAME_MODIFY_MODE_PREPEND:
+			case WCRENAME_MODIFY_MODE_CHANGE_EXT:
 			{
-				RenamyAddWidget* replace_widget = new RenamyAddWidget(this);
-				QObject::connect( replace_widget, &RenamyAddWidget::updated, this, &RenamyEditLineWidget::updated );
+				WcRenameAddWidget* replace_widget = new WcRenameAddWidget(this);
+				QObject::connect( replace_widget, &WcRenameAddWidget::updated, this, &WcRenameEditLineWidget::updated );
 				replace_widget->installEventFilter(this);
 				return replace_widget;
 			}
-			case RENAMY_MODIFY_MODE_CHANGE_CASE:
+			case WCRENAME_MODIFY_MODE_CHANGE_CASE:
 			{
-				RenamyChangeCaseWidget* replace_widget = new RenamyChangeCaseWidget(this);
-				QObject::connect( replace_widget, &RenamyChangeCaseWidget::updated, this, &RenamyEditLineWidget::updated );
+				WcRenameChangeCaseWidget* replace_widget = new WcRenameChangeCaseWidget(this);
+				QObject::connect( replace_widget, &WcRenameChangeCaseWidget::updated, this, &WcRenameEditLineWidget::updated );
 				replace_widget->installEventFilter(this);
 				replace_widget->_casing->installEventFilter(this);
 				return replace_widget;
@@ -395,14 +395,14 @@ private:
 		addsub->addWidget(sub);
 		add->setFocusPolicy(Qt::NoFocus);
 		sub->setFocusPolicy(Qt::NoFocus);
-		QObject::connect( add, &QPushButton::clicked, this, &RenamyEditLineWidget::addClicked );
-		QObject::connect( sub, &QPushButton::clicked, this, &RenamyEditLineWidget::subClicked );
+		QObject::connect( add, &QPushButton::clicked, this, &WcRenameEditLineWidget::addClicked );
+		QObject::connect( sub, &QPushButton::clicked, this, &WcRenameEditLineWidget::subClicked );
 		return w;
 	}
 
 	void changeMode( int mode )
 	{
-		QWidget* new_mode_widget = createModeWidget((renamy_modify_mode)mode);
+		QWidget* new_mode_widget = createModeWidget((wcrename_modify_mode)mode);
 		layout()->replaceWidget(_current_mode_widget, new_mode_widget);
 		delete _current_mode_widget;
 		_current_mode_widget = new_mode_widget;
@@ -413,24 +413,24 @@ private:
 public:
 	QWidget*   _current_mode_widget;
 
-	renamy_modify_mode replaceMode()
+	wcrename_modify_mode replaceMode()
 	{
-		return (renamy_modify_mode)_replace_mode->currentIndex();
+		return (wcrename_modify_mode)_replace_mode->currentIndex();
 	}
 
-	RenamyEditLineWidget(QWidget* parent)
+	WcRenameEditLineWidget(QWidget* parent)
 		: QWidget(parent)
 	{
 		QHBoxLayout* layout = new QHBoxLayout(this);
 		layout->setContentsMargins(0,0,0,0);
 
 		_replace_mode = new QComboBox(this);
-		for( int i = 0; i < RENAMY_MODIFY_MODE_COUNT; ++i )
-			_replace_mode->addItem( RENAMY_MODIFY_MODE_NAMES[i] );
-		_replace_mode->setCurrentIndex(RENAMY_MODIFY_MODE_REPLACE);
-		_current_mode_widget = createModeWidget(RENAMY_MODIFY_MODE_REPLACE);
+		for( int i = 0; i < WCRENAME_MODIFY_MODE_COUNT; ++i )
+			_replace_mode->addItem( WCRENAME_MODIFY_MODE_NAMES[i] );
+		_replace_mode->setCurrentIndex(WCRENAME_MODIFY_MODE_REPLACE);
+		_current_mode_widget = createModeWidget(WCRENAME_MODIFY_MODE_REPLACE);
 
-		QObject::connect( _replace_mode, (void (QComboBox::*)(int))&QComboBox::currentIndexChanged, this, &RenamyEditLineWidget::changeMode );
+		QObject::connect( _replace_mode, (void (QComboBox::*)(int))&QComboBox::currentIndexChanged, this, &WcRenameEditLineWidget::changeMode );
 
 		layout->addWidget( _replace_mode );
 		layout->addWidget( _current_mode_widget );
@@ -438,14 +438,14 @@ public:
 	}
 };
 
-class RenamyMainWindow : public QDialog
+class WcRenameMainWindow : public QDialog
 {
 	QTableWidget* _preview;
 	QVBoxLayout*  _edits;
 	QComboBox*    _copy_type;
 
 	// TODO: no more qt here to be able to compile cli without qt.
-	QList<renamy_filter_op> _ops;
+	QList<wcrename_filter_op> _ops;
 	QStringList _src;
 	QStringList _dst;
 
@@ -483,7 +483,7 @@ class RenamyMainWindow : public QDialog
 
 	void accepted()
 	{
-		renamy_copy_files( (renamy_copy_type)_copy_type->currentIndex(), _src, _dst, _src.size() );
+		wcrename_copy_files( (wcrename_copy_type)_copy_type->currentIndex(), _src, _dst, _src.size() );
 	}
 
     void keyPressEvent(QKeyEvent* ev)
@@ -498,19 +498,19 @@ class RenamyMainWindow : public QDialog
 
     void addClicked()
 	{
-		RenamyEditLineWidget* line = new RenamyEditLineWidget(this);
-		QObject::connect(line, &RenamyEditLineWidget::updated, this, [this, line]() {
+		WcRenameEditLineWidget* line = new WcRenameEditLineWidget(this);
+		QObject::connect(line, &WcRenameEditLineWidget::updated, this, [this, line]() {
 			updateEditItem(line);
 		} );
-		QObject::connect(line, &RenamyEditLineWidget::addClicked, this, [this]() {
+		QObject::connect(line, &WcRenameEditLineWidget::addClicked, this, [this]() {
 			addClicked();
 		} );
-		QObject::connect(line, &RenamyEditLineWidget::subClicked, this, [this, line]() {
+		QObject::connect(line, &WcRenameEditLineWidget::subClicked, this, [this, line]() {
 			subClicked(line);
 		} );
 
 		_edits->addWidget( line );
-		_ops.append( renamy_filter_op() );
+		_ops.append( wcrename_filter_op() );
 		updateEditItem( line );
 	}
 
@@ -523,34 +523,34 @@ class RenamyMainWindow : public QDialog
 		delete _edits->takeAt(index);
 	}
 
-    void updateEditItem( RenamyEditLineWidget* line )
+    void updateEditItem( WcRenameEditLineWidget* line )
     {
     	int index = _edits->indexOf(line);
     	QWidget* mode_widget = line->_current_mode_widget;
 
-		renamy_filter_op op;
+		wcrename_filter_op op;
 		op._op = line->replaceMode();
 
 		switch( op._op )
 		{
-			case RENAMY_MODIFY_MODE_REPLACE:
-			case RENAMY_MODIFY_MODE_REPLACE_BEGIN:
-			case RENAMY_MODIFY_MODE_REPLACE_END:
-				op._arg1 = ((RenamyReplaceWidget*)mode_widget)->replace();
-				op._arg2 = ((RenamyReplaceWidget*)mode_widget)->with();
+			case WCRENAME_MODIFY_MODE_REPLACE:
+			case WCRENAME_MODIFY_MODE_REPLACE_BEGIN:
+			case WCRENAME_MODIFY_MODE_REPLACE_END:
+				op._arg1 = ((WcRenameReplaceWidget*)mode_widget)->replace();
+				op._arg2 = ((WcRenameReplaceWidget*)mode_widget)->with();
 				break;
-			case RENAMY_MODIFY_MODE_APPEND:
-			case RENAMY_MODIFY_MODE_PREPEND:
-			case RENAMY_MODIFY_MODE_CHANGE_EXT:
-				op._arg1 = ((RenamyAddWidget*)mode_widget)->add();
+			case WCRENAME_MODIFY_MODE_APPEND:
+			case WCRENAME_MODIFY_MODE_PREPEND:
+			case WCRENAME_MODIFY_MODE_CHANGE_EXT:
+				op._arg1 = ((WcRenameAddWidget*)mode_widget)->add();
 				break;
-			case RENAMY_MODIFY_MODE_CHANGE_CASE:
-				op._casing = ((RenamyChangeCaseWidget*)mode_widget)->casing();
+			case WCRENAME_MODIFY_MODE_CHANGE_CASE:
+				op._casing = ((WcRenameChangeCaseWidget*)mode_widget)->casing();
 				break;
 		}
 
 		_ops[index] = op;
-		renamy_filter_apply( _ops, _src, _dst );
+		wcrename_filter_apply( _ops, _src, _dst );
 		populatePreview();
     }
 
@@ -569,9 +569,9 @@ class RenamyMainWindow : public QDialog
     	QHBoxLayout* bottom = new QHBoxLayout(w);
     	bottom->setContentsMargins(0,0,0,0);
 		_copy_type = new QComboBox(w);
-		for( int i = 0; i < RENAMY_COPY_TYPE_COUNT; ++i )
-			_copy_type->addItem( RENAMY_COPY_TYPES_NAMES[i] );
-		_copy_type->setCurrentIndex( RENAMY_COPY_TYPE_FS_MOVE );
+		for( int i = 0; i < WCRENAME_COPY_TYPE_COUNT; ++i )
+			_copy_type->addItem( WCRENAME_COPY_TYPES_NAMES[i] );
+		_copy_type->setCurrentIndex( WCRENAME_COPY_TYPE_FS_MOVE );
 
 		QWidget* ok_cancel_w = new QWidget(w);
 		QHBoxLayout* ok_cancel = new QHBoxLayout(ok_cancel_w);
@@ -587,13 +587,13 @@ class RenamyMainWindow : public QDialog
     }
 
 public:
-	RenamyMainWindow( QStringList& source_files )
+	WcRenameMainWindow( QStringList& source_files )
 	{
 		_src = source_files;
 		_dst = source_files;
 
 		setModal(true);
-        setWindowTitle("renamy - rename ALL THE FILES! (ctrl+Enter to apply, esc to cancel)");
+        setWindowTitle("wcrename - rename ALL THE FILES! (ctrl+Enter to apply, esc to cancel)");
         setWindowIcon(QIcon("icons/replace.png"));
         setMinimumSize(QSize(1024, 500));
 
@@ -605,7 +605,7 @@ public:
     	// ... add initial item ...
     	addClicked();
 
-        QObject::connect(this, &QDialog::accepted, this, &RenamyMainWindow::accepted );
+        QObject::connect(this, &QDialog::accepted, this, &WcRenameMainWindow::accepted );
 	}
 };
 
@@ -616,7 +616,7 @@ int main( int argc, char** argv )
 	QStringList src;
 	for( int i = 1; i < argc; ++i )
 		src << argv[i];
-	RenamyMainWindow( src ).exec();
+	WcRenameMainWindow( src ).exec();
 	return 0;
 }
 
